@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "YT Music Filters",
+  "description": "Advanced filters for YouTube Music playlists",
+  "version": "0.0.1",
+
+  "host_permissions": [
+    "https://music.youtube.com/*"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://music.youtube.com/*"
+      ],
+      "js": [
+        "src/content.tsx"
+      ]
+    }
+  ]
+}

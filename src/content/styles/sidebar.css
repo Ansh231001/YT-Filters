@@ -1,0 +1,545 @@
+/* ==========================================================================
+   YT Music Filters — Premium Shadow DOM Styles
+   ========================================================================== */
+
+:host {
+  all: initial;
+  z-index: 2147483647;
+}
+
+#ytm-filters-app {
+  --bg-primary: #0f1117;
+  --bg-secondary: #161821;
+  --bg-glass: rgba(15, 17, 23, 0.85);
+  --bg-card: rgba(22, 24, 33, 0.7);
+  --bg-hover: rgba(255, 255, 255, 0.08);
+  --bg-active: rgba(255, 255, 255, 0.12);
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --accent-primary: #a855f7;
+  --accent-secondary: #ec4899;
+  --accent-gradient: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  --accent-glow: rgba(168, 85, 247, 0.35);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-highlight: rgba(168, 85, 247, 0.5);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+  --sidebar-width: 400px;
+  --sidebar-collapsed-width: 68px;
+  --header-height: 64px;
+  --nav-height: 56px;
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ytm-filters-app[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  --bg-card: rgba(241, 245, 249, 0.8);
+  --bg-hover: rgba(0, 0, 0, 0.05);
+  --bg-active: rgba(0, 0, 0, 0.09);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent-primary: #9333ea;
+  --accent-secondary: #db2777;
+  --accent-gradient: linear-gradient(135deg, #9333ea 0%, #db2777 100%);
+  --accent-glow: rgba(147, 51, 234, 0.25);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-highlight: rgba(147, 51, 234, 0.4);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+#ytm-filters-app * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ==========================================================================
+   Floating Trigger Button (When Sidebar is Closed)
+   ========================================================================== */
+
+#ytm-filters-trigger {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--accent-gradient);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px var(--accent-glow), var(--shadow-xl);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: pulseGlow 3s infinite alternate;
+}
+
+#ytm-filters-trigger:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 12px 32px var(--accent-glow), 0 15px 25px rgba(0, 0, 0, 0.4);
+}
+
+#ytm-filters-trigger:active {
+  transform: translateY(0) scale(0.96);
+}
+
+#ytm-filters-trigger .trigger-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Sidebar Drawer Container
+   ========================================================================== */
+
+#ytm-filters-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  z-index: 2147483647;
+  background: var(--bg-glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid var(--border-color);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(0);
+}
+
+#ytm-filters-sidebar.closed {
+  transform: translateX(105%);
+  pointer-events: none;
+}
+
+#ytm-filters-sidebar.collapsed {
+  width: var(--sidebar-collapsed-width);
+}
+
+/* Resize Handle */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 8px;
+  height: 100%;
+  cursor: ew-resize;
+  z-index: 100;
+  transition: background 0.2s ease;
+}
+
+.resize-handle:hover,
+.resize-handle.resizing {
+  background: var(--accent-gradient);
+  opacity: 0.8;
+}
+
+#ytm-filters-sidebar.collapsed .resize-handle {
+  display: none;
+}
+
+/* ==========================================================================
+   Header Component
+   ========================================================================== */
+
+.ytm-header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+.ytm-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ytm-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent-gradient);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.ytm-brand-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.ytm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==========================================================================
+   Navigation Tabs Bar
+   ========================================================================== */
+
+.ytm-nav {
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+#ytm-filters-sidebar.collapsed .ytm-nav {
+  flex-direction: column;
+  height: auto;
+  padding: 16px 0;
+  gap: 12px;
+  border-bottom: none;
+}
+
+.ytm-nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.ytm-nav-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.ytm-nav-tab.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.ytm-nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+}
+
+#ytm-filters-sidebar.collapsed .ytm-nav-tab.active::after {
+  bottom: 6px;
+  top: 6px;
+  left: -8px;
+  right: auto;
+  width: 3px;
+  height: auto;
+}
+
+.ytm-nav-tab span {
+  transition: opacity 0.2s ease;
+}
+
+#ytm-filters-sidebar.collapsed .ytm-nav-tab span {
+  display: none;
+}
+
+#ytm-filters-sidebar.collapsed .ytm-nav-tab {
+  padding: 10px;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+/* ==========================================================================
+   Main Content View Area
+   ========================================================================== */
+
+.ytm-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#ytm-filters-sidebar.collapsed .ytm-content {
+  display: none;
+}
+
+/* Custom Scrollbar */
+.ytm-content::-webkit-scrollbar {
+  width: 6px;
+}
+.ytm-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ytm-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+.ytm-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ==========================================================================
+   Common UI Components & Cards
+   ========================================================================== */
+
+.ytm-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.ytm-card:hover {
+  border-color: var(--border-highlight);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.ytm-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.ytm-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ytm-card-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Buttons */
+.ytm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.ytm-btn-primary {
+  background: var(--accent-gradient);
+  color: #fff;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+.ytm-btn-primary:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--accent-glow);
+}
+
+.ytm-btn-secondary {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+.ytm-btn-secondary:hover {
+  background: var(--bg-active);
+  border-color: var(--text-muted);
+}
+
+.ytm-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ytm-icon-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+/* Status Pill */
+.ytm-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.ytm-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseDot 2s infinite;
+}
+
+/* Form controls & Options */
+.ytm-select, .ytm-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+.ytm-select:focus, .ytm-input:focus {
+  border-color: var(--accent-primary);
+}
+
+/* Grid layout for preview chips */
+.ytm-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.ytm-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.ytm-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+  background: var(--bg-hover);
+}
+
+/* Collapped Expand Footer */
+.ytm-collapsed-footer {
+  margin-top: auto;
+  padding: 16px 0;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ==========================================================================
+   Keyframe Animations
+   ========================================================================== */
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 8px 24px var(--accent-glow), var(--shadow-xl);
+  }
+  100% {
+    box-shadow: 0 12px 36px rgba(236, 72, 153, 0.4), var(--shadow-xl);
+  }
+}
+
+@keyframes floatIcon {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes pulseDot {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
