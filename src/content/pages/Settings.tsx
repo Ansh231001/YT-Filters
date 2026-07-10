@@ -107,7 +107,7 @@ export const Settings: React.FC<SettingsProps> = ({
           <Shield size={14} style={{ color: 'var(--accent-primary)' }} />
         </div>
         <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-          Phase 1 Extension Shell — Built with React 19, TypeScript, Vite & Shadow DOM.
+          Phase 1 Extension Shell - Built with React 19, TypeScript, Vite & Shadow DOM.
         </p>
       </div>
     </div>
